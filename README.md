@@ -11,7 +11,7 @@ Vagrant v1.9.1
 
 Steps to Run:
 -------------
-1. newsdata.sql already loaded in postress sql installed in VM Vagrant
+1. Import newsdata.sql data using the command: psql -d news -f newsdata.sql
 2. Clone git repository https://github.com/mosesmaxwell/udacity-logs-analysis.git or Download the zip file
 3. Unzip/Go to the downloaded folder
 4. Copy the project folder in to your VM vagrant folder

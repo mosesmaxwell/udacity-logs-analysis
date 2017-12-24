@@ -6,33 +6,39 @@ import psycopg2
 
 DBNAME = "news"
 
+
 def execute_query(query):
     """Run the query and return results"""
-
-    conn = psycopg2.connect(database=DBNAME)
-    cur = conn.cursor()
+    try:
+        conn = psycopg2.connect(database=DBNAME)
+        cur = conn.cursor()
+    except psycopg2.Error as ex:
+        print('Database connection error!'+type(ex).__name__)
     cur.execute(query)
     records = cur.fetchall()
     conn.close()
     return records
 
+
 def get_most_popular_article():
     """
     1. What are the most popular three articles of all time?
     Which articles have been accessed the most?
-    Present this information as a sorted list with the most popular article at the top.
+    Present this information as a sorted list with the
+    most popular article at the top.
     """
 
     query = """
       SELECT a.title, count(*) as num
-      FROM articles a 
-      JOIN log l 
-      ON l.path LIKE '%' || a.slug
-      GROUP BY a.title 
-      ORDER BY num DESC 
+      FROM articles a
+      JOIN log l
+      ON l.path = concat('/article/', a.slug)
+      GROUP BY a.title
+      ORDER BY num DESC
       LIMIT 3"""
     results = execute_query(query)
     return results
+
 
 def get_most_popular_article_autors():
     """
@@ -44,16 +50,17 @@ def get_most_popular_article_autors():
 
     query = """
       SELECT a.name, count(*) AS num
-      FROM authors a 
-      JOIN articles ar  
+      FROM authors a
+      JOIN articles ar
       ON a.id = ar.author
       JOIN log l
-      ON l.path LIKE '%' || ar.slug
-      GROUP BY a.name 
+      ON l.path = concat('/article/', ar.slug)
+      GROUP BY a.name
       ORDER BY num DESC
       """
     results = execute_query(query)
     return results
+
 
 def get_popular_erros():
     """
@@ -64,9 +71,15 @@ def get_popular_erros():
 
     query = """
       SELECT t.day, ROUND(((e.err*1.0) / t.reqs) , 3) AS percent
-      FROM (SELECT date_trunc('day', time) "day", count(*) AS err FROM log WHERE status LIKE '404%' GROUP BY day) AS e 
-      JOIN (SELECT date_trunc('day', time) "day", count(*) AS reqs FROM log GROUP BY day) AS t 
-      ON e.day = t.day 
+      FROM (
+          SELECT date_trunc('day', time) "day", count(*) AS err
+          FROM log WHERE status LIKE '404%' GROUP BY day
+          ) AS e
+      JOIN (
+          SELECT date_trunc('day', time) "day", count(*) AS reqs
+          FROM log GROUP BY day
+          ) AS t
+      ON e.day = t.day
       WHERE (ROUND(((e.err*1.0) / t.reqs) , 3) > 0.01)
       ORDER BY percent DESC
       """

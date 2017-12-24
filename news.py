@@ -4,10 +4,13 @@
 
 from newsdb import *
 
+
 def most_popular_three_articles():
+
     """
     What are the most popular three articles of all time
     """
+
     logs = get_most_popular_article()
     print('*******************')
     print('Top three articles!')
@@ -18,10 +21,13 @@ def most_popular_three_articles():
         row += 1
     print('\n\n')
 
+
 def most_popular_article_autors():
+
     """
     Who are the most popular article authors of all time
     """
+
     logs = get_most_popular_article_autors()
     print('*******************')
     print('Popular article authors!')
@@ -32,10 +38,13 @@ def most_popular_article_autors():
         row += 1
     print('\n\n')
 
+
 def popular_erros():
+
     """
     On which days did more than 1% of requests lead to errors
     """
+
     logs = get_popular_erros()
     print('*******************')
     print('Days with more than 1% of errors!')
